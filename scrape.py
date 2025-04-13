@@ -28,7 +28,7 @@ for container in soup.find_all("div", class_="actualHadithContainer"):
         "reference": reference
     })
 
-# Save to CSV with UTF-8-BOM for Excel compatibility
+
 csv_filename = "C:\\Users\\user\\desktop\\fatwa_ai\\hadith_data.csv"
 with open(csv_filename, "w", newline="", encoding="utf-8-sig") as csvfile:
     writer = csv.writer(csvfile)

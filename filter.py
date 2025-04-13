@@ -63,7 +63,7 @@ filtered_df.to_excel(output_file, index=False)
 evidence_df.to_excel(evidence_file, index=False)
 
 print(f"""
-✅ Processing complete!
+  Processing complete!
 - Filtered fatwas saved to: {output_file}
 - Extracted {len(evidence_df)} evidence references saved to: {evidence_file}
 - Original answers cleaned with evidence removed
