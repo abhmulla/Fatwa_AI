@@ -16,7 +16,7 @@ EMBEDDING_MODEL = 'intfloat/multilingual-e5-base'
 
 # Initialize DeepSeek client
 client = OpenAI(
-    api_key="sk-ada12965346c4d36aa1368d6b81a7018",
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
     base_url="https://api.deepseek.com/v1",
 )
 
