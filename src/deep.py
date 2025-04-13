@@ -3,11 +3,10 @@ import json
 import numpy as np
 from openai import OpenAI
 from dotenv import load_dotenv
-from typing import List, Dict
 from sentence_transformers import SentenceTransformer
 import faiss
 
-load_dotenv()
+load_dotenv(dotenv_path="C:/Users/user/Desktop/fatwa_ai/deep.env")
 
 # Configuration
 JSON_PATH = "C:\\Users\\user\\desktop\\fatwa_ai\\RAGDATA\\inheritance_restructured.json"
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     # Integrated pipeline execution
     documents = load_and_format_documents(JSON_PATH)
     index, model, docs = build_faiss_index(documents)
-    query = "إذا توفي شخص وترك زوجة وابنتين، كيف يتم توزيع التركة؟"
+    query = "ماتت امرأة عن زوج وثلاث بنات ابن وأخ شقیق، كيف يتم توزيع التركة؟"
     retrieved_context = retrieve_documents(query, index, model, docs)
     context = "\n\n".join(retrieved_context)
     final_prompt = PROMPT_TEMPLATE.format(context=context, question=query)
