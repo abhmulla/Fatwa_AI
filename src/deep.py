@@ -39,6 +39,22 @@ PROMPT_TEMPLATE = """\
 
 
 def load_and_format_documents(path):
+    """
+    Loads and formats Islamic inheritance data from a JSON file.
+
+    Each document is processed based on its type:
+    - For "القرآن الكريم": includes concept, text, and source.
+    - For "حديث": includes concept and text.
+    - For "حالة ميراث": includes heir, concept, rule, and condition.
+
+    Each document is also tagged with a reference label for later citation.
+
+    Args:
+        path (str): Path to the JSON file.
+
+    Returns:
+        List[str]: A list of formatted document strings ready for embedding.
+    """
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -61,6 +77,22 @@ def load_and_format_documents(path):
     return documents
 
 def build_faiss_index(docs, model_name=EMBEDDING_MODEL):
+    """
+    Creates embeddings for the input documents and builds a FAISS index.
+
+    Uses SentenceTransformer to generate semantic vector representations,
+    and stores them in a FAISS flat L2 index for fast similarity search.
+
+    Args:
+        docs (List[str]): List of formatted documents.
+        model_name (str): Name of the embedding model.
+
+    Returns:
+        Tuple[faiss.Index, SentenceTransformer, List[str]]:
+            - The FAISS index with embedded documents.
+            - The embedding model used.
+            - The original list of documents.
+    """
     model = SentenceTransformer(model_name)
     embeddings = model.encode(docs, show_progress_bar=True)
     index = faiss.IndexFlatL2(embeddings.shape[1])
@@ -69,12 +101,38 @@ def build_faiss_index(docs, model_name=EMBEDDING_MODEL):
 
 
 def retrieve_documents(query, index, model, docs, top_k=3):
+    """
+    Retrieves the top_k most relevant documents for a given query.
+
+    Encodes the query using the same embedding model, searches the FAISS index,
+    and returns the matching document strings.
+
+    Args:
+        query (str): The user query.
+        index (faiss.Index): The FAISS index to search in.
+        model (SentenceTransformer): The embedding model used.
+        docs (List[str]): Original list of formatted documents.
+        top_k (int): Number of top matches to return (default is 3).
+
+    Returns:
+        List[str]: The top_k most relevant documents for the query.
+    """
     query_embedding = model.encode([query])[0]
     distances, indices = index.search(np.array([query_embedding]), top_k)
     return [docs[i] for i in indices[0]]
 
 def get_deepseek_response(prompt: str) -> str:
-    """Get response from DeepSeek API with Islamic law context"""
+    """
+    Sends a prompt to the DeepSeek model via API and returns the generated response.
+
+    The prompt should include a scholarly question and context. Handles API errors gracefully.
+
+    Args:
+        prompt (str): The full prompt to send to the model.
+
+    Returns:
+        str: The generated response from the model, or an error message.
+    """
     try:
         response = client.chat.completions.create(
             model="deepseek-chat",
